@@ -34,8 +34,8 @@ export default function ClientsPage() {
               const clientCases = data.cases.filter((c: any) => c.clientId === client.id);
               const hasProfile = client.profile !== null;
               return (
-                <tr key={client.id}>
-                  <td><strong>{client.name}</strong></td>
+                <tr key={client.id} style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/clients/${client.id}`}>
+                  <td><strong style={{ color: 'var(--primary)' }}>{client.name}</strong></td>
                   <td style={{ fontFamily: 'monospace', fontSize: 12 }}>{client.id}</td>
                   <td>{clientCases.length}</td>
                   <td>
