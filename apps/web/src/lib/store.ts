@@ -6,10 +6,22 @@
 
 export type StepStatus = 'pending' | 'processing' | 'awaiting_review' | 'approved' | 'failed' | 'skipped';
 
+export interface ClientFile {
+  id: string;
+  filename: string;
+  mimeType: string;
+  sizeBytes: number;
+  purpose: string;
+  uploadedAt: string;
+  processed: boolean;
+  extractedData: Record<string, unknown> | null;
+}
+
 export interface Client {
   id: string;
   name: string;
   profile: Record<string, unknown> | null;
+  files: ClientFile[];
   createdAt: string;
   updatedAt: string;
 }
@@ -84,6 +96,7 @@ function seedDemoData() {
   const client1: Client = {
     id: 'client_001',
     name: 'Petr Svoboda',
+    files: [],
     profile: {
       personal: { full_name: 'Petr Svoboda', birth_year: 1988, marital_status: 'married' },
       household: { dependents_count: 2, household_members: 4 },
@@ -100,6 +113,7 @@ function seedDemoData() {
   const client2: Client = {
     id: 'client_002',
     name: 'Jana Králová',
+    files: [],
     profile: {
       personal: { full_name: 'Jana Králová', birth_year: 1992, marital_status: 'single' },
       economic: {
@@ -261,6 +275,7 @@ export function createClient(data: { name: string }): Client {
     id,
     name: data.name,
     profile: null,
+    files: [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -483,6 +498,253 @@ export function editAndApproveStep(caseId: string, step: string, edits: Record<s
   c.updatedAt = new Date().toISOString();
   cases.set(caseId, c);
   return c;
+}
+
+// ---------- Client file management ----------
+
+export function addClientFile(clientId: string, file: { filename: string; mimeType: string; sizeBytes: number; purpose: string }): ClientFile | undefined {
+  const client = clients.get(clientId);
+  if (!client) return undefined;
+  const cf: ClientFile = {
+    id: `cfile_${String(Date.now()).slice(-6)}_${Math.random().toString(36).slice(2, 5)}`,
+    filename: file.filename,
+    mimeType: file.mimeType,
+    sizeBytes: file.sizeBytes,
+    purpose: file.purpose,
+    uploadedAt: new Date().toISOString(),
+    processed: false,
+    extractedData: null,
+  };
+  client.files.push(cf);
+  client.updatedAt = new Date().toISOString();
+  return cf;
+}
+
+export function removeClientFile(clientId: string, fileId: string): boolean {
+  const client = clients.get(clientId);
+  if (!client) return false;
+  const idx = client.files.findIndex(f => f.id === fileId);
+  if (idx === -1) return false;
+  client.files.splice(idx, 1);
+  client.updatedAt = new Date().toISOString();
+  return true;
+}
+
+export function processClientFile(clientId: string, fileId: string): { extracted: Record<string, unknown>; profileUpdates: Record<string, unknown> } | undefined {
+  const client = clients.get(clientId);
+  if (!client) return undefined;
+  const file = client.files.find(f => f.id === fileId);
+  if (!file) return undefined;
+
+  // Mock AI extraction based on file type
+  const extracted = generateMockExtraction(file.filename, file.mimeType, file.purpose, client.name);
+  file.processed = true;
+  file.extractedData = extracted;
+
+  // Merge extracted data into client profile
+  const profile = (client.profile || {}) as any;
+  const updates: Record<string, unknown> = {};
+
+  if (extracted.personal) {
+    profile.personal = { ...(profile.personal || {}), ...(extracted.personal as any) };
+    updates.personal = extracted.personal;
+  }
+  if (extracted.household) {
+    profile.household = { ...(profile.household || {}), ...(extracted.household as any) };
+    updates.household = extracted.household;
+  }
+  if (extracted.economic) {
+    profile.economic = { ...(profile.economic || {}), ...(extracted.economic as any) };
+    updates.economic = extracted.economic;
+  }
+  if (extracted.insurance) {
+    profile.insurance = { ...(profile.insurance || {}), ...(extracted.insurance as any) };
+    updates.insurance = extracted.insurance;
+  }
+  if (extracted.investments) {
+    profile.investments = { ...(profile.investments || {}), ...(extracted.investments as any) };
+    updates.investments = extracted.investments;
+  }
+  if (extracted.credit) {
+    profile.credit = { ...(profile.credit || {}), ...(extracted.credit as any) };
+    updates.credit = extracted.credit;
+  }
+  if (extracted.pension) {
+    profile.pension = { ...(profile.pension || {}), ...(extracted.pension as any) };
+    updates.pension = extracted.pension;
+  }
+  if (extracted.property_insurance) {
+    profile.property_insurance = { ...(profile.property_insurance || {}), ...(extracted.property_insurance as any) };
+    updates.property_insurance = extracted.property_insurance;
+  }
+  if (extracted.health) {
+    profile.health = { ...(profile.health || {}), ...(extracted.health as any) };
+    updates.health = extracted.health;
+  }
+  if (extracted.notes) {
+    profile.advisor_notes = [...(profile.advisor_notes || []), ...(extracted.notes as string[])];
+    updates.notes = extracted.notes;
+  }
+
+  client.profile = profile;
+  client.updatedAt = new Date().toISOString();
+
+  return { extracted, profileUpdates: updates };
+}
+
+function generateMockExtraction(filename: string, mimeType: string, purpose: string, clientName: string): Record<string, unknown> {
+  const fn = filename.toLowerCase();
+
+  // Insurance contract
+  if (fn.includes('pojist') || fn.includes('smlouva') || purpose === 'existing_contract') {
+    return {
+      _source: filename,
+      _type: 'insurance_contract',
+      insurance: {
+        provider: 'Česká pojišťovna',
+        product_name: 'Životní pojištění FLEXI',
+        contract_number: 'ZP-2018-' + Math.floor(Math.random() * 900000 + 100000),
+        start_date: '2018-06-01',
+        monthly_premium: 1250,
+        coverage: {
+          death: 500000,
+          permanent_disability: 0,
+          temporary_disability: 0,
+          hospitalization: 0,
+          serious_illness: 0,
+        },
+        beneficiary: 'Zákonní dědici',
+        notes: 'Starší smlouva bez krytí invalidity. Doporučena revize.',
+      },
+    };
+  }
+
+  // Pension statement
+  if (fn.includes('penzij') || fn.includes('dps') || fn.includes('ps_') || fn.includes('penz')) {
+    return {
+      _source: filename,
+      _type: 'pension_statement',
+      pension: {
+        provider: 'ČSOB Penzijní společnost',
+        product_type: 'Doplňkové penzijní spoření',
+        contract_number: 'DPS-' + Math.floor(Math.random() * 900000 + 100000),
+        own_contribution: 500,
+        employer_contribution: 300,
+        total_saved: 85000,
+        strategy: 'Vyvážená',
+        state_contribution: 130,
+        tax_benefit_used: false,
+        notes: 'Nízký vlastní příspěvek — nedosahuje na max. státní příspěvek (1000 Kč = 230 Kč).',
+      },
+    };
+  }
+
+  // Mortgage / bank statement
+  if (fn.includes('hypot') || fn.includes('uver') || fn.includes('banka') || fn.includes('kb_') || fn.includes('splatk')) {
+    return {
+      _source: filename,
+      _type: 'mortgage_statement',
+      credit: {
+        type: 'Hypotéka',
+        provider: 'Komerční banka',
+        original_amount: 3200000,
+        remaining_balance: 2200000,
+        interest_rate: 3.89,
+        monthly_payment: 12500,
+        fixation_end: '2027-03',
+        maturity: '2043-06',
+        property_type: 'Byt 3+kk',
+        ltv_ratio: 68.75,
+      },
+    };
+  }
+
+  // Investment statement
+  if (fn.includes('invest') || fn.includes('fond') || fn.includes('portf')) {
+    return {
+      _source: filename,
+      _type: 'investment_portfolio',
+      investments: {
+        total_value: 150000,
+        products: [
+          { name: 'Spořicí účet', provider: 'Air Bank', value: 150000, type: 'savings', interest_rate: 3.5 },
+        ],
+        monthly_investment: 0,
+        risk_profile: 'Konzervativní',
+        notes: 'Žádné investiční fondy. Pouze likvidní rezerva na spořicím účtu.',
+      },
+    };
+  }
+
+  // Audio recording
+  if (mimeType.startsWith('audio/') || fn.includes('.mp3') || fn.includes('.wav') || fn.includes('.m4a') || purpose === 'meeting_recording') {
+    return {
+      _source: filename,
+      _type: 'meeting_transcript',
+      personal: {
+        health_status: 'Bez omezení',
+        smoker: false,
+      },
+      household: {
+        housing_type: 'Vlastní byt',
+        monthly_housing_costs: 4500,
+      },
+      economic: {
+        partner_income: { amount: 32000, currency: 'CZK' },
+        monthly_expenses: 45000,
+        emergency_fund_months: 3.1,
+      },
+      notes: [
+        `Klient ${clientName} zmínil zájem o pravidelné investování, obavy z rizika.`,
+        'Manželka zvažuje přechod na OSVČ — možný dopad na příjem.',
+        'Klient chce mít pojištěnou rodinu do doby splacení hypotéky.',
+      ],
+    };
+  }
+
+  // Property insurance
+  if (fn.includes('majetek') || fn.includes('domacnost') || fn.includes('nemovit') || purpose === 'property_insurance') {
+    return {
+      _source: filename,
+      _type: 'property_insurance',
+      property_insurance: {
+        provider: 'Kooperativa',
+        property_value: 4500000,
+        insurance_amount: 4000000,
+        monthly_premium: 380,
+        coverage: ['požár', 'záplava', 'krádež', 'vandalismus'],
+        deductible: 5000,
+        liability_included: true,
+        liability_amount: 2000000,
+      },
+    };
+  }
+
+  // Advisor notes / generic document
+  if (purpose === 'advisor_notes' || fn.includes('poznamk') || fn.includes('.txt') || fn.includes('.docx')) {
+    return {
+      _source: filename,
+      _type: 'advisor_notes',
+      health: {
+        status: 'Dobrý',
+        chronic_conditions: [],
+        medications: [],
+        last_checkup: '2025-11',
+      },
+      notes: [
+        `Z dokumentu "${filename}": Klient preferuje konzervativní přístup k investicím.`,
+        'Důležité: Fixace hypotéky končí za rok — připravit nabídky refinancování.',
+        'Klient má zájem o pojištění majetku — aktuálně nepojištěn.',
+      ],
+    };
+  }
+
+  // Fallback
+  return {
+    _source: filename,
+    _type: 'unknown',
+    notes: [`Soubor "${filename}" byl nahrán, ale typ dokumentu nebyl automaticky rozpoznán. Vyžaduje manuální kontrolu.`],
+  };
 }
 
 // ---------- Mock generators ----------

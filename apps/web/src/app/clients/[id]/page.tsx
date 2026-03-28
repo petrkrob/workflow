@@ -3,11 +3,23 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 
+interface ClientFileData {
+  id: string;
+  filename: string;
+  mimeType: string;
+  sizeBytes: number;
+  purpose: string;
+  uploadedAt: string;
+  processed: boolean;
+  extractedData: any;
+}
+
 interface ClientData {
   client: {
     id: string;
     name: string;
     profile: any;
+    files: ClientFileData[];
     createdAt: string;
     updatedAt: string;
   };
@@ -391,32 +403,7 @@ export default function ClientDetailPage() {
       )}
 
       {activeTab === 'documents' && (
-        <div className="card section">
-          <h3>Dokumenty</h3>
-          {aggregated.documents.length === 0 ? (
-            <p style={{ color: '#9ca3af', fontSize: 14 }}>Zatim zadne dokumenty.</p>
-          ) : (
-            <div>
-              {aggregated.documents.map((d, i) => (
-                <div key={i} style={{
-                  display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
-                  borderBottom: '1px solid var(--border)', fontSize: 14,
-                }}>
-                  <span style={{ fontSize: 20 }}>{purposeIcon(d.purpose)}</span>
-                  <div style={{ flex: 1 }}>
-                    <strong>{d.filename}</strong>
-                    <div style={{ fontSize: 12, color: '#6b7280' }}>
-                      {purposeLabel(d.purpose)} | {formatSize(d.sizeBytes)} | {d.uploadedAt.slice(0, 10)}
-                    </div>
-                  </div>
-                  <a href={`/cases/${d.caseId}`} style={{ fontSize: 12, color: 'var(--primary)' }}>
-                    Zobrazit schuzku
-                  </a>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <ClientDocumentsTab clientId={clientId} clientFiles={client.files || []} caseDocuments={aggregated.documents} onUpdate={fetchClient} />
       )}
 
       {activeTab === 'ask' && (
@@ -578,4 +565,190 @@ function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function ClientDocumentsTab({ clientId, clientFiles, caseDocuments, onUpdate }: {
+  clientId: string;
+  clientFiles: ClientFileData[];
+  caseDocuments: Array<{ filename: string; purpose: string; sizeBytes: number; uploadedAt: string; caseId: string }>;
+  onUpdate: () => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [purpose, setPurpose] = useState('other');
+  const [lastResult, setLastResult] = useState<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setLastResult(null);
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('purpose', purpose);
+
+    try {
+      const res = await fetch(`/api/clients/${clientId}/files`, {
+        method: 'POST',
+        body: formData,
+      });
+      const result = await res.json();
+      setLastResult(result);
+      onUpdate();
+    } catch {
+      setLastResult({ error: 'Upload selhal' });
+    }
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleDelete = async (fileId: string) => {
+    await fetch(`/api/clients/${clientId}/files`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fileId }),
+    });
+    onUpdate();
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Upload form */}
+      <div className="card section">
+        <h3>Nahrat soubor</h3>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+          <div>
+            <label style={{ fontSize: 12, color: '#6b7280', display: 'block', marginBottom: 4 }}>Typ dokumentu</label>
+            <select
+              value={purpose}
+              onChange={e => setPurpose(e.target.value)}
+              style={{ padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 14 }}
+            >
+              <option value="existing_contract">Smlouva</option>
+              <option value="meeting_recording">Nahravka schuzky</option>
+              <option value="new_model">Modelace</option>
+              <option value="product_info">Podklad</option>
+              <option value="advisor_notes">Poznamky poradce</option>
+              <option value="other">Ostatni</option>
+            </select>
+          </div>
+          <div>
+            <label style={{ fontSize: 12, color: '#6b7280', display: 'block', marginBottom: 4 }}>Soubor (PDF, DOCX, audio...)</label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.docx,.doc,.xlsx,.xls,.mp3,.wav,.m4a,.ogg,.png,.jpg,.jpeg"
+              onChange={handleUpload}
+              disabled={uploading}
+              style={{ fontSize: 14 }}
+            />
+          </div>
+          {uploading && <span style={{ color: 'var(--primary)', fontSize: 14 }}>Nahravam a zpracovavam...</span>}
+        </div>
+      </div>
+
+      {/* Last upload result */}
+      {lastResult && !lastResult.error && (
+        <div className="card section" style={{ border: '2px solid #16a34a' }}>
+          <h3 style={{ color: '#16a34a' }}>Soubor zpracovan</h3>
+          <p style={{ fontSize: 14 }}>
+            <strong>{lastResult.file?.filename}</strong> — {lastResult.processed ? 'AI rozpoznala obsah' : 'Bez automaticke analyzy'}
+          </p>
+          {lastResult.extractedData && (
+            <div style={{ marginTop: 12 }}>
+              <h4 style={{ fontSize: 13, color: '#6b7280', marginBottom: 8 }}>Rozpoznana data:</h4>
+              <div style={{ background: '#f0fdf4', padding: 12, borderRadius: 8, fontSize: 13 }}>
+                {Object.entries(lastResult.extractedData).map(([section, data]) => (
+                  <div key={section} style={{ marginBottom: 8 }}>
+                    <strong style={{ textTransform: 'capitalize' }}>{section.replace(/_/g, ' ')}:</strong>
+                    <pre style={{ margin: '4px 0 0', fontSize: 12, whiteSpace: 'pre-wrap', color: '#374151' }}>
+                      {JSON.stringify(data, null, 2)}
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {lastResult.profileUpdates && (
+            <div style={{ marginTop: 8, fontSize: 13, color: '#16a34a' }}>
+              Profil klienta byl aktualizovan v sekcich: {Object.keys(lastResult.profileUpdates).join(', ')}
+            </div>
+          )}
+        </div>
+      )}
+      {lastResult?.error && (
+        <div className="card section" style={{ border: '2px solid #dc2626', color: '#dc2626' }}>
+          Chyba: {lastResult.error}
+        </div>
+      )}
+
+      {/* Client files */}
+      <div className="card section">
+        <h3>Nahrane soubory klienta ({clientFiles.length})</h3>
+        {clientFiles.length === 0 ? (
+          <p style={{ color: '#9ca3af', fontSize: 14 }}>Zatim zadne soubory.</p>
+        ) : (
+          <div style={{ display: 'grid', gap: 8 }}>
+            {clientFiles.map(f => (
+              <div key={f.id} style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '10px 14px', border: '1px solid var(--border)', borderRadius: 'var(--radius)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 20 }}>{purposeIcon(f.purpose)}</span>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 500 }}>{f.filename}</div>
+                    <div style={{ fontSize: 12, color: '#6b7280' }}>
+                      {purposeLabel(f.purpose)} · {formatSize(f.sizeBytes)} · {new Date(f.uploadedAt).toLocaleDateString('cs-CZ')}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <span className={`badge badge-${f.processed ? 'approved' : 'pending'}`}>
+                    {f.processed ? 'Zpracovano' : 'Nezpracovano'}
+                  </span>
+                  <button
+                    onClick={() => handleDelete(f.id)}
+                    style={{
+                      background: 'none', border: '1px solid #dc2626', color: '#dc2626',
+                      borderRadius: 4, padding: '4px 8px', fontSize: 12, cursor: 'pointer',
+                    }}
+                  >
+                    Smazat
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Case documents */}
+      {caseDocuments.length > 0 && (
+        <div className="card section">
+          <h3>Dokumenty ze schuzek ({caseDocuments.length})</h3>
+          <div style={{ display: 'grid', gap: 8 }}>
+            {caseDocuments.map((d, i) => (
+              <div key={i} style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '8px 14px', border: '1px solid var(--border)', borderRadius: 'var(--radius)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 20 }}>{purposeIcon(d.purpose)}</span>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 500 }}>{d.filename}</div>
+                    <div style={{ fontSize: 12, color: '#6b7280' }}>
+                      {purposeLabel(d.purpose)} · {formatSize(d.sizeBytes)} · {new Date(d.uploadedAt).toLocaleDateString('cs-CZ')}
+                    </div>
+                  </div>
+                </div>
+                <a href={`/cases/${d.caseId}`} style={{ fontSize: 12, color: 'var(--primary)' }}>Zobrazit schuzku</a>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
