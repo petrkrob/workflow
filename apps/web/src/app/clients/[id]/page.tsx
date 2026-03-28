@@ -261,15 +261,22 @@ export default function ClientDetailPage() {
                   'Jmeno': profile.personal?.full_name,
                   'Rok narozeni': profile.personal?.birth_year,
                   'Rodinny stav': translateMarital(profile.personal?.marital_status),
+                  'Zdravotni stav': profile.personal?.health_status,
+                  'Kurak': profile.personal?.smoker === false ? 'Ne' : profile.personal?.smoker === true ? 'Ano' : undefined,
                 }} />
                 <ProfileSection title="Domacnost" data={{
                   'Clenu domacnosti': profile.household?.household_members,
                   'Vyzivovanych osob': profile.household?.dependents_count,
+                  'Bydleni': profile.household?.housing_type,
+                  'Naklady na bydleni': profile.household?.monthly_housing_costs ? `${profile.household.monthly_housing_costs.toLocaleString('cs-CZ')} Kč` : undefined,
                 }} />
                 <ProfileSection title="Ekonomika" data={{
                   'Status': translateEmployment(profile.economic?.employment_status),
                   'Profese': profile.economic?.profession,
                   'Cisty prijem': profile.economic?.net_monthly_income ? `${profile.economic.net_monthly_income.amount?.toLocaleString('cs-CZ')} ${profile.economic.net_monthly_income.currency}` : undefined,
+                  'Prijem partnera': profile.economic?.partner_income ? `${profile.economic.partner_income.amount?.toLocaleString('cs-CZ')} ${profile.economic.partner_income.currency}` : undefined,
+                  'Mesicni vydaje': profile.economic?.monthly_expenses ? `${profile.economic.monthly_expenses.toLocaleString('cs-CZ')} Kč` : undefined,
+                  'Rezerva (mesice)': profile.economic?.emergency_fund_months,
                 }} />
               </div>
             ) : (
@@ -279,6 +286,148 @@ export default function ClientDetailPage() {
               </div>
             )}
           </div>
+
+          {/* Insurance section */}
+          {profile?.insurance && (
+            <div className="card section">
+              <h3>Zivotni pojisteni</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <ProfileSection title="Smlouva" data={{
+                  'Pojistovna': profile.insurance.provider,
+                  'Produkt': profile.insurance.product_name,
+                  'Cislo smlouvy': profile.insurance.contract_number,
+                  'Od': profile.insurance.start_date,
+                  'Mesicni platba': profile.insurance.monthly_premium ? `${profile.insurance.monthly_premium.toLocaleString('cs-CZ')} Kč` : undefined,
+                  'Obmyslena osoba': profile.insurance.beneficiary,
+                }} />
+                {profile.insurance.coverage && (
+                  <ProfileSection title="Kryti" data={{
+                    'Smrt': profile.insurance.coverage.death ? `${profile.insurance.coverage.death.toLocaleString('cs-CZ')} Kč` : 'Bez kryti',
+                    'Trv. invalidita': profile.insurance.coverage.permanent_disability ? `${profile.insurance.coverage.permanent_disability.toLocaleString('cs-CZ')} Kč` : 'Bez kryti',
+                    'Pracovni neschopnost': profile.insurance.coverage.temporary_disability ? `${profile.insurance.coverage.temporary_disability.toLocaleString('cs-CZ')} Kč/den` : 'Bez kryti',
+                    'Hospitalizace': profile.insurance.coverage.hospitalization ? `${profile.insurance.coverage.hospitalization.toLocaleString('cs-CZ')} Kč/den` : 'Bez kryti',
+                    'Vazna onemocneni': profile.insurance.coverage.serious_illness ? `${profile.insurance.coverage.serious_illness.toLocaleString('cs-CZ')} Kč` : 'Bez kryti',
+                  }} />
+                )}
+              </div>
+              {profile.insurance.notes && (
+                <div style={{ marginTop: 12, padding: '8px 12px', background: '#fef3c7', borderRadius: 8, fontSize: 13, color: '#92400e' }}>
+                  {profile.insurance.notes}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Credit / Mortgage section */}
+          {profile?.credit && (
+            <div className="card section">
+              <h3>{profile.credit.type || 'Uver'}</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <ProfileSection title="Detail uveru" data={{
+                  'Typ': profile.credit.type,
+                  'Banka': profile.credit.provider,
+                  'Puvodni castka': profile.credit.original_amount ? `${profile.credit.original_amount.toLocaleString('cs-CZ')} Kč` : undefined,
+                  'Zbyvajici dluh': profile.credit.remaining_balance ? `${profile.credit.remaining_balance.toLocaleString('cs-CZ')} Kč` : undefined,
+                  'Splatnost': profile.credit.maturity,
+                }} />
+                <ProfileSection title="Podminky" data={{
+                  'Urokova sazba': profile.credit.interest_rate ? `${profile.credit.interest_rate} %` : undefined,
+                  'Mesicni splatka': profile.credit.monthly_payment ? `${profile.credit.monthly_payment.toLocaleString('cs-CZ')} Kč` : undefined,
+                  'Konec fixace': profile.credit.fixation_end,
+                  'LTV': profile.credit.ltv_ratio ? `${profile.credit.ltv_ratio} %` : undefined,
+                  'Nemovitost': profile.credit.property_type,
+                }} />
+              </div>
+            </div>
+          )}
+
+          {/* Pension section */}
+          {profile?.pension && (
+            <div className="card section">
+              <h3>Penzijni sporeni</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <ProfileSection title="Smlouva" data={{
+                  'Spolecnost': profile.pension.provider,
+                  'Typ': profile.pension.product_type,
+                  'Cislo smlouvy': profile.pension.contract_number,
+                  'Strategie': profile.pension.strategy,
+                }} />
+                <ProfileSection title="Prispevky" data={{
+                  'Vlastni prispevek': profile.pension.own_contribution ? `${profile.pension.own_contribution.toLocaleString('cs-CZ')} Kč` : undefined,
+                  'Prispevek zamestnavatele': profile.pension.employer_contribution ? `${profile.pension.employer_contribution.toLocaleString('cs-CZ')} Kč` : undefined,
+                  'Statni prispevek': profile.pension.state_contribution ? `${profile.pension.state_contribution.toLocaleString('cs-CZ')} Kč` : undefined,
+                  'Celkem nasporeno': profile.pension.total_saved ? `${profile.pension.total_saved.toLocaleString('cs-CZ')} Kč` : undefined,
+                  'Danove zvyhodneni': profile.pension.tax_benefit_used ? 'Ano' : 'Ne',
+                }} />
+              </div>
+              {profile.pension.notes && (
+                <div style={{ marginTop: 12, padding: '8px 12px', background: '#fef3c7', borderRadius: 8, fontSize: 13, color: '#92400e' }}>
+                  {profile.pension.notes}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Investments section */}
+          {profile?.investments && (
+            <div className="card section">
+              <h3>Investice</h3>
+              <ProfileSection title="Prehled" data={{
+                'Celkova hodnota': profile.investments.total_value ? `${profile.investments.total_value.toLocaleString('cs-CZ')} Kč` : undefined,
+                'Mesicni investice': profile.investments.monthly_investment ? `${profile.investments.monthly_investment.toLocaleString('cs-CZ')} Kč` : '0 Kč',
+                'Rizikovy profil': profile.investments.risk_profile,
+              }} />
+              {profile.investments.products?.length > 0 && (
+                <div style={{ marginTop: 12 }}>
+                  <h4 style={{ fontSize: 13, fontWeight: 600, color: '#6b7280', marginBottom: 8, textTransform: 'uppercase' }}>Produkty</h4>
+                  {profile.investments.products.map((p: any, i: number) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)', fontSize: 14 }}>
+                      <span>{p.name} ({p.provider})</span>
+                      <span style={{ fontWeight: 500 }}>{p.value?.toLocaleString('cs-CZ')} Kč</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {profile.investments.notes && (
+                <div style={{ marginTop: 12, padding: '8px 12px', background: '#fef3c7', borderRadius: 8, fontSize: 13, color: '#92400e' }}>
+                  {profile.investments.notes}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Property insurance section */}
+          {profile?.property_insurance && (
+            <div className="card section">
+              <h3>Pojisteni majetku</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <ProfileSection title="Detail" data={{
+                  'Pojistovna': profile.property_insurance.provider,
+                  'Hodnota nemovitosti': profile.property_insurance.property_value ? `${profile.property_insurance.property_value.toLocaleString('cs-CZ')} Kč` : undefined,
+                  'Pojistna castka': profile.property_insurance.insurance_amount ? `${profile.property_insurance.insurance_amount.toLocaleString('cs-CZ')} Kč` : undefined,
+                  'Mesicni pojistne': profile.property_insurance.monthly_premium ? `${profile.property_insurance.monthly_premium.toLocaleString('cs-CZ')} Kč` : undefined,
+                  'Spoluucast': profile.property_insurance.deductible ? `${profile.property_insurance.deductible.toLocaleString('cs-CZ')} Kč` : undefined,
+                }} />
+                <ProfileSection title="Kryti" data={{
+                  'Rizika': profile.property_insurance.coverage?.join(', '),
+                  'Odpovednost': profile.property_insurance.liability_included ? 'Ano' : 'Ne',
+                  'Limit odpovednosti': profile.property_insurance.liability_amount ? `${profile.property_insurance.liability_amount.toLocaleString('cs-CZ')} Kč` : undefined,
+                }} />
+              </div>
+            </div>
+          )}
+
+          {/* Advisor notes */}
+          {profile?.advisor_notes?.length > 0 && (
+            <div className="card section">
+              <h3>Poznamky</h3>
+              {profile.advisor_notes.map((note: string, i: number) => (
+                <div key={i} style={{ padding: '6px 0', borderBottom: '1px solid var(--border)', fontSize: 14, color: '#374151' }}>
+                  {note}
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Financial facts */}
           {aggregated.facts.length > 0 && (
