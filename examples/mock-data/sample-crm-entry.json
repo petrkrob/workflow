@@ -1,0 +1,46 @@
+{
+  "crm_entry_id": "crm_001",
+  "case_id": "case_001",
+  "client_id": "client_001",
+  "created_at": "2026-03-27T14:30:00Z",
+  "updated_at": "2026-03-27T14:30:00Z",
+  "top_priorities": [
+    "Ochrana rodiny — navýšení ŽP + přidání invalidity a PN",
+    "Refinancování hypotéky (fixace končí 03/2027)",
+    "Zahájení pravidelného investování"
+  ],
+  "agreed_actions": [
+    "Poradce připraví modelaci nového ŽP s rozšířeným krytím do 5.4.",
+    "Poradce připraví 3 investiční varianty do 5.4.",
+    "Klient dodá kopii smlouvy z ČP a výpis z PS do 1.4.",
+    "Schůzka na prezentaci návrhů kolem 10.4."
+  ],
+  "advisor_tasks": [
+    { "description": "Modelace ŽP (smrt + invalidita + PN)", "priority": "high", "deadline": "2026-04-05", "status": "open" },
+    { "description": "3 varianty pravidelného investování", "priority": "medium", "deadline": "2026-04-05", "status": "open" },
+    { "description": "Průzkum refinancování hypotéky u 3 bank", "priority": "low", "deadline": "2026-04-15", "status": "open" }
+  ],
+  "client_tasks": [
+    { "description": "Dodat pojistnou smlouvu ČP", "priority": "high", "deadline": "2026-04-01", "status": "open" },
+    { "description": "Dodat výpis z penzijního spoření ČSOB", "priority": "medium", "deadline": "2026-04-01", "status": "open" }
+  ],
+  "next_contact": {
+    "type": "meeting",
+    "date": "2026-04-10",
+    "condition": "Po dodání dokumentů klientem",
+    "notes": "Prezentace modelací ŽP a investičních variant"
+  },
+  "open_questions": [
+    "Zdravotní stav klienta (pro modelaci ŽP)",
+    "Přesné pojistné na stávající ŽP",
+    "Stav majetkového pojištění"
+  ],
+  "notes_for_followup": "Klient je analytický typ — připravit porovnání variant v tabulce. Obavy z rizika — zdůraznit konzervativní složku u investic. Manželka nebyla na schůzce, zvážit pozvání příště.",
+  "review_status": "pending",
+  "generation_metadata": {
+    "model_used": "claude-sonnet-4-20250514",
+    "prompt_version": "1.0.0",
+    "source_summary_id": "sum_001",
+    "source_profile_id": "client_001"
+  }
+}

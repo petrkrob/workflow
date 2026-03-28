@@ -1,0 +1,159 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://financial-advisor-workflow/schemas/client-profile.json",
+  "title": "ClientProfile",
+  "description": "360° cumulative client profile",
+  "type": "object",
+  "required": ["client_id", "personal"],
+  "properties": {
+    "client_id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "personal": {
+      "type": "object",
+      "required": ["full_name"],
+      "properties": {
+        "full_name": { "type": "string" },
+        "internal_id": { "type": "string" },
+        "birth_year": { "type": "integer" },
+        "date_of_birth": { "type": "string", "format": "date" },
+        "marital_status": { "type": "string", "enum": ["single", "married", "divorced", "widowed", "partnership", "unknown"] },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" }
+      }
+    },
+    "household": {
+      "type": "object",
+      "properties": {
+        "dependents_count": { "type": "integer", "minimum": 0 },
+        "dependents_details": { "type": "array", "items": { "type": "string" } },
+        "household_members": { "type": "integer", "minimum": 1 },
+        "household_description": { "type": "string" }
+      }
+    },
+    "economic": {
+      "type": "object",
+      "properties": {
+        "employment_status": { "type": "string", "enum": ["employed", "self_employed", "unemployed", "retired", "student", "parental_leave", "unknown"] },
+        "profession": { "type": "string" },
+        "employer": { "type": "string" },
+        "net_monthly_income": { "$ref": "#/$defs/money_amount" },
+        "other_income": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": { "type": "string" },
+              "amount": { "$ref": "#/$defs/money_amount" },
+              "frequency": { "type": "string", "enum": ["monthly", "quarterly", "yearly", "one_time"] }
+            }
+          }
+        },
+        "monthly_household_expenses": { "$ref": "#/$defs/money_amount" },
+        "monthly_obligations": { "$ref": "#/$defs/money_amount" },
+        "liquid_reserve": { "$ref": "#/$defs/money_amount" }
+      }
+    },
+    "assets": {
+      "type": "object",
+      "properties": {
+        "real_estate": { "type": "array", "items": { "$ref": "#/$defs/asset_item" } },
+        "savings": { "type": "array", "items": { "$ref": "#/$defs/asset_item" } },
+        "investment_products": { "type": "array", "items": { "type": "object" } },
+        "credit_products": { "type": "array", "items": { "type": "object" } },
+        "property_insurance": { "type": "array", "items": { "type": "object" } },
+        "life_insurance": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "retirement": {
+      "type": "object",
+      "properties": {
+        "pension_pillar_1": { "type": "string" },
+        "pension_pillar_2": { "type": "string" },
+        "pension_pillar_3": { "type": "array", "items": { "type": "object" } },
+        "disability_coverage": { "type": "string" },
+        "income_protection": { "type": "string" },
+        "long_term_financial_goals": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "risk_profile": {
+      "type": "object",
+      "properties": {
+        "risk_tolerance": { "type": "string", "enum": ["conservative", "moderate", "balanced", "growth", "aggressive", "unknown"] },
+        "liquidity_preference": { "type": "string", "enum": ["high", "medium", "low", "unknown"] },
+        "income_stability": { "type": "string", "enum": ["stable", "variable", "unstable", "unknown"] },
+        "uncertainty_tolerance": { "type": "string", "enum": ["low", "medium", "high", "unknown"] },
+        "investment_horizon": { "type": "string" }
+      }
+    },
+    "goals": {
+      "type": "object",
+      "properties": {
+        "short_term": { "type": "array", "items": { "$ref": "#/$defs/goal_item" } },
+        "medium_term": { "type": "array", "items": { "$ref": "#/$defs/goal_item" } },
+        "long_term": { "type": "array", "items": { "$ref": "#/$defs/goal_item" } },
+        "top_priorities": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "behavioral": {
+      "type": "object",
+      "properties": {
+        "concerns": { "type": "array", "items": { "type": "string" } },
+        "motivations": { "type": "array", "items": { "type": "string" } },
+        "objections": { "type": "array", "items": { "type": "string" } },
+        "communication_preference": { "type": "string" },
+        "decision_style": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "history": {
+      "type": "object",
+      "properties": {
+        "previous_meetings": { "type": "array", "items": { "type": "object" } },
+        "open_topics": { "type": "array", "items": { "type": "string" } },
+        "open_tasks": { "type": "array", "items": { "type": "object" } },
+        "unresolved_areas": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "profile_completeness_score": { "type": "number", "minimum": 0, "maximum": 100 },
+        "last_meeting_date": { "type": "string", "format": "date" },
+        "total_meetings": { "type": "integer", "minimum": 0 },
+        "data_quality_notes": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "$defs": {
+    "money_amount": {
+      "type": "object",
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": { "type": "number" },
+        "currency": { "type": "string", "default": "CZK" }
+      }
+    },
+    "asset_item": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "estimated_value": { "$ref": "#/$defs/money_amount" },
+        "notes": { "type": "string" }
+      }
+    },
+    "goal_item": {
+      "type": "object",
+      "required": ["description"],
+      "properties": {
+        "description": { "type": "string" },
+        "target_amount": { "$ref": "#/$defs/money_amount" },
+        "target_date": { "type": "string", "format": "date" },
+        "priority": { "type": "string", "enum": ["high", "medium", "low"] }
+      }
+    }
+  }
+}

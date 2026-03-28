@@ -1,0 +1,298 @@
+{
+  "summary_id": "sum_001",
+  "case_id": "case_001",
+  "transcript_id": "tr_001",
+  "created_at": "2026-03-27T14:00:00Z",
+  "updated_at": "2026-03-27T14:00:00Z",
+  "meeting_context": {
+    "participants": [
+      { "name": "Jan Novák", "role": "advisor" },
+      { "name": "Petr Svoboda", "role": "client" }
+    ],
+    "meeting_type": "initial",
+    "meeting_date": "2026-03-25",
+    "duration_minutes": 75,
+    "general_mood": "Klient byl otevřený, aktivně se zajímal, kladl doplňující otázky"
+  },
+  "discussed_topics": [
+    {
+      "topic": "Životní pojištění a ochrana příjmu",
+      "category": "insurance",
+      "key_points": [
+        "Klient má stávající životní pojištění u České pojišťovny z roku 2018",
+        "Pojistná částka pro případ smrti 500 000 Kč — klient sám vnímá jako nízkou",
+        "Nemá krytí invalidity ani pracovní neschopnosti",
+        "Chce zvážit navýšení krytí a přidání rizikových připojištění"
+      ]
+    },
+    {
+      "topic": "Investice a spoření",
+      "category": "investment",
+      "key_points": [
+        "Klient má 150 000 Kč na spořicím účtu",
+        "Nemá žádné investiční produkty",
+        "Zajímá se o pravidelné investování, ale má obavy z rizika",
+        "Investiční horizont 10-15 let (bydlení pro děti, důchod)"
+      ]
+    },
+    {
+      "topic": "Penzijní spoření",
+      "category": "retirement",
+      "key_points": [
+        "Má doplňkové penzijní spoření u ČSOB PS od roku 2020",
+        "Přispívá 500 Kč měsíčně, zaměstnavatel přidává 300 Kč",
+        "Zvažuje navýšení příspěvku pro vyšší daňovou úlevu"
+      ]
+    },
+    {
+      "topic": "Hypotéka",
+      "category": "mortgage",
+      "key_points": [
+        "Hypotéka u Komerční banky, zůstatek cca 2 200 000 Kč",
+        "Splátka 12 500 Kč měsíčně",
+        "Fixace končí v březnu 2027 — bude potřeba refinancovat",
+        "Úroková sazba 3,89 %"
+      ]
+    }
+  ],
+  "financial_facts": [
+    {
+      "fact": "Čistý měsíční příjem klienta 48 000 Kč",
+      "category": "income",
+      "value": "48000 CZK",
+      "confidence": "confirmed",
+      "source": "client_statement"
+    },
+    {
+      "fact": "Manželka má příjem cca 32 000 Kč čistého",
+      "category": "income",
+      "value": "32000 CZK",
+      "confidence": "mentioned",
+      "source": "client_statement"
+    },
+    {
+      "fact": "Měsíční výdaje domácnosti odhadem 45 000 Kč",
+      "category": "expense",
+      "value": "45000 CZK",
+      "confidence": "mentioned",
+      "source": "client_statement"
+    },
+    {
+      "fact": "Hypotéka — zůstatek 2 200 000 Kč, splátka 12 500 Kč/měsíc",
+      "category": "liability",
+      "value": "2200000 CZK",
+      "confidence": "confirmed",
+      "source": "client_statement"
+    },
+    {
+      "fact": "Likvidní rezerva na spořicím účtu 150 000 Kč",
+      "category": "asset",
+      "value": "150000 CZK",
+      "confidence": "confirmed",
+      "source": "client_statement"
+    },
+    {
+      "fact": "Životní pojištění u ČP, pojistná částka na smrt 500 000 Kč",
+      "category": "insurance",
+      "value": "500000 CZK",
+      "confidence": "confirmed",
+      "source": "client_statement"
+    }
+  ],
+  "client_goals": [
+    {
+      "description": "Zvýšit ochranu rodiny pro případ smrti nebo invalidity",
+      "timeframe": "short_term",
+      "priority": "high",
+      "confidence": "explicit"
+    },
+    {
+      "description": "Začít pravidelně investovat na dlouhodobý horizont",
+      "timeframe": "medium_term",
+      "priority": "medium",
+      "confidence": "explicit"
+    },
+    {
+      "description": "Připravit se na refinancování hypotéky v 2027",
+      "timeframe": "medium_term",
+      "priority": "high",
+      "confidence": "explicit"
+    },
+    {
+      "description": "Zajistit finanční prostředky na bydlení pro děti",
+      "timeframe": "long_term",
+      "priority": "medium",
+      "confidence": "inferred"
+    }
+  ],
+  "client_concerns": [
+    {
+      "description": "Obava z investičního rizika — nechce přijít o peníze",
+      "severity": "medium"
+    },
+    {
+      "description": "Nejistota ohledně budoucích úrokových sazeb u hypotéky",
+      "severity": "medium"
+    },
+    {
+      "description": "Pochybnosti, zda je stávající životní pojištění dostatečné",
+      "severity": "high"
+    }
+  ],
+  "current_products_mentioned": [
+    {
+      "product_name": "Životní pojištění",
+      "provider": "Česká pojišťovna",
+      "type": "Rizikové životní pojištění",
+      "context": "existing",
+      "details": "Od roku 2018, pojistná částka na smrt 500 000 Kč, bez dalších připojištění"
+    },
+    {
+      "product_name": "Doplňkové penzijní spoření",
+      "provider": "ČSOB Penzijní společnost",
+      "type": "III. pilíř",
+      "context": "existing",
+      "details": "Od roku 2020, 500 Kč klient + 300 Kč zaměstnavatel"
+    },
+    {
+      "product_name": "Hypoteční úvěr",
+      "provider": "Komerční banka",
+      "type": "Hypotéka",
+      "context": "to_be_reviewed",
+      "details": "Zůstatek 2,2 mil Kč, sazba 3,89 %, fixace končí 03/2027"
+    }
+  ],
+  "desired_changes": [
+    {
+      "description": "Navýšit pojistnou částku na životním pojištění a přidat krytí invalidity",
+      "area": "insurance",
+      "urgency": "soon",
+      "agreed": true
+    },
+    {
+      "description": "Nastavit pravidelné investování — konzervativní/balancovaná strategie",
+      "area": "investment",
+      "urgency": "soon",
+      "agreed": true
+    },
+    {
+      "description": "Připravit varianty refinancování hypotéky",
+      "area": "mortgage",
+      "urgency": "future",
+      "agreed": true
+    }
+  ],
+  "agreements": [
+    {
+      "description": "Poradce připraví modelaci nového životního pojištění s rozšířeným krytím",
+      "responsible": "advisor",
+      "deadline": "2026-04-05"
+    },
+    {
+      "description": "Klient dodá kopii stávající pojistné smlouvy z ČP",
+      "responsible": "client",
+      "deadline": "2026-04-01"
+    },
+    {
+      "description": "Poradce připraví návrh pravidelného investování (3 varianty)",
+      "responsible": "advisor",
+      "deadline": "2026-04-05"
+    }
+  ],
+  "advisor_tasks": [
+    {
+      "task_id": "task_adv_001",
+      "description": "Připravit modelaci nového ŽP s krytím smrti, invalidity a PN",
+      "assigned_to": "advisor",
+      "priority": "high",
+      "deadline": "2026-04-05",
+      "status": "open"
+    },
+    {
+      "task_id": "task_adv_002",
+      "description": "Připravit 3 varianty pravidelného investování (konzervativní, balancovaná, růstová)",
+      "assigned_to": "advisor",
+      "priority": "medium",
+      "deadline": "2026-04-05",
+      "status": "open"
+    },
+    {
+      "task_id": "task_adv_003",
+      "description": "Zjistit aktuální podmínky refinancování u 3 bank",
+      "assigned_to": "advisor",
+      "priority": "low",
+      "deadline": "2026-04-15",
+      "status": "open"
+    }
+  ],
+  "client_tasks": [
+    {
+      "task_id": "task_cli_001",
+      "description": "Dodat kopii stávající pojistné smlouvy z České pojišťovny",
+      "assigned_to": "client",
+      "priority": "high",
+      "deadline": "2026-04-01",
+      "status": "open"
+    },
+    {
+      "task_id": "task_cli_002",
+      "description": "Dodat výpis z penzijního spoření ČSOB PS",
+      "assigned_to": "client",
+      "priority": "medium",
+      "deadline": "2026-04-01",
+      "status": "open"
+    }
+  ],
+  "missing_information": [
+    {
+      "description": "Přesná výše pojistného na stávajícím ŽP",
+      "category": "insurance",
+      "importance": "critical",
+      "suggested_question": "Kolik platíte měsíčně za životní pojištění?"
+    },
+    {
+      "description": "Zdravotní stav klienta (pro modelaci ŽP)",
+      "category": "personal",
+      "importance": "critical",
+      "suggested_question": "Máte nějaké zdravotní omezení nebo probíhající léčbu?"
+    },
+    {
+      "description": "Pojištění nemovitosti a domácnosti",
+      "category": "insurance",
+      "importance": "important",
+      "suggested_question": "Máte pojištěný byt/dům a domácnost?"
+    },
+    {
+      "description": "Přesná výše měsíčních výdajů domácnosti",
+      "category": "financial",
+      "importance": "important",
+      "suggested_question": "Můžete upřesnit vaše měsíční výdaje po kategoriích?"
+    }
+  ],
+  "follow_up_items": [
+    {
+      "description": "Prezentovat modelace ŽP a investičních variant",
+      "type": "meeting",
+      "responsible": "advisor",
+      "deadline": "2026-04-10"
+    },
+    {
+      "description": "Analyzovat stávající pojistnou smlouvu po dodání klientem",
+      "type": "action",
+      "responsible": "advisor"
+    }
+  ],
+  "next_step": "Klient dodá pojistnou smlouvu a výpis z PS do 1.4. Poradce připraví modelace a sejdeme se kolem 10.4. na prezentaci návrhů.",
+  "extraction_metadata": {
+    "model_used": "claude-sonnet-4-20250514",
+    "prompt_version": "1.0.0",
+    "extraction_confidence": 87,
+    "processing_time_ms": 4200,
+    "warnings": [],
+    "data_layer_markers": [
+      { "field_path": "financial_facts[0]", "layer": "raw_data", "source_reference": "segment_12" },
+      { "field_path": "client_goals[3]", "layer": "interpreted", "source_reference": "segment_45" }
+    ]
+  },
+  "review_status": "pending"
+}

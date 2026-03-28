@@ -1,0 +1,10 @@
+{
+  "name": "@faw/workflows",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/contracts.ts",
+  "types": "./src/contracts.ts",
+  "dependencies": {
+    "@faw/core": "*"
+  }
+}

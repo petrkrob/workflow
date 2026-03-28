@@ -1,0 +1,6 @@
+{
+  "name": "@faw/ai-prompts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Versioned AI prompt templates for each workflow module"
+}

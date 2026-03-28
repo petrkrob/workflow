@@ -1,0 +1,7 @@
+{
+  "name": "@faw/security",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/pii-detector.ts",
+  "types": "./src/pii-detector.ts"
+}

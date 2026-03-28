@@ -1,0 +1,150 @@
+{
+  "client_id": "client_001",
+  "created_at": "2026-03-27T14:00:00Z",
+  "updated_at": "2026-03-27T14:00:00Z",
+  "personal": {
+    "full_name": "Petr Svoboda",
+    "internal_id": "CL-2026-001",
+    "birth_year": 1988,
+    "marital_status": "married"
+  },
+  "household": {
+    "dependents_count": 2,
+    "dependents_details": ["Syn, 6 let", "Dcera, 3 roky"],
+    "household_members": 4,
+    "household_description": "Manželé se dvěma dětmi, vlastní byt 3+kk"
+  },
+  "economic": {
+    "employment_status": "employed",
+    "profession": "IT projektový manažer",
+    "net_monthly_income": { "amount": 48000, "currency": "CZK" },
+    "other_income": [
+      { "source": "Příjem manželky", "amount": { "amount": 32000, "currency": "CZK" }, "frequency": "monthly" }
+    ],
+    "monthly_household_expenses": { "amount": 45000, "currency": "CZK" },
+    "monthly_obligations": { "amount": 12500, "currency": "CZK" },
+    "liquid_reserve": { "amount": 150000, "currency": "CZK" }
+  },
+  "assets": {
+    "real_estate": [
+      {
+        "name": "Byt 3+kk, Praha 9",
+        "type": "apartment",
+        "estimated_value": { "amount": 5500000, "currency": "CZK" },
+        "notes": "Vlastní, zatížen hypotékou"
+      }
+    ],
+    "savings": [
+      {
+        "name": "Spořicí účet",
+        "type": "savings_account",
+        "estimated_value": { "amount": 150000, "currency": "CZK" }
+      }
+    ],
+    "investment_products": [],
+    "credit_products": [
+      {
+        "name": "Hypoteční úvěr",
+        "provider": "Komerční banka",
+        "type": "mortgage",
+        "outstanding_balance": { "amount": 2200000, "currency": "CZK" },
+        "monthly_payment": { "amount": 12500, "currency": "CZK" },
+        "interest_rate": 3.89,
+        "end_date": "2041-03",
+        "notes": "Fixace končí 03/2027"
+      }
+    ],
+    "property_insurance": [],
+    "life_insurance": [
+      {
+        "name": "Rizikové životní pojištění",
+        "provider": "Česká pojišťovna",
+        "type": "risk_life_insurance",
+        "coverage_summary": "Smrt 500 000 Kč. Bez krytí invalidity a PN.",
+        "start_date": "2018",
+        "notes": "Klient vnímá jako nedostatečné"
+      }
+    ]
+  },
+  "retirement": {
+    "pension_pillar_3": [
+      {
+        "name": "Doplňkové penzijní spoření",
+        "provider": "ČSOB Penzijní společnost",
+        "type": "DPS",
+        "monthly_contribution": { "amount": 500, "currency": "CZK" },
+        "employer_contribution": { "amount": 300, "currency": "CZK" },
+        "notes": "Od roku 2020"
+      }
+    ],
+    "disability_coverage": "Nemá",
+    "income_protection": "Nemá"
+  },
+  "risk_profile": {
+    "risk_tolerance": "moderate",
+    "liquidity_preference": "medium",
+    "income_stability": "stable",
+    "investment_horizon": "10-15 let"
+  },
+  "goals": {
+    "short_term": [
+      { "description": "Zvýšit ochranu rodiny — navýšit ŽP, přidat invaliditu", "priority": "high" }
+    ],
+    "medium_term": [
+      { "description": "Začít pravidelně investovat", "priority": "medium" },
+      { "description": "Refinancovat hypotéku v 2027 za lepších podmínek", "priority": "high" }
+    ],
+    "long_term": [
+      { "description": "Finanční prostředky na bydlení pro děti", "priority": "medium" },
+      { "description": "Důchodové zabezpečení", "priority": "medium" }
+    ],
+    "top_priorities": [
+      "Ochrana příjmu a rodiny",
+      "Refinancování hypotéky",
+      "Pravidelné investování"
+    ]
+  },
+  "behavioral": {
+    "concerns": [
+      "Obava z investičního rizika",
+      "Nejistota ohledně úrokových sazeb",
+      "Nedostatečné stávající pojištění"
+    ],
+    "motivations": [
+      "Ochrana rodiny",
+      "Budoucnost dětí",
+      "Finanční stabilita"
+    ],
+    "communication_preference": "Osobní schůzka, doplňkově e-mail",
+    "decision_style": "Analytický — potřebuje vidět čísla a porovnání variant"
+  },
+  "history": {
+    "previous_meetings": [
+      { "case_id": "case_001", "date": "2026-03-25", "summary_snippet": "Úvodní schůzka — mapování situace" }
+    ],
+    "open_topics": [
+      "Revize životního pojištění",
+      "Nastavení investičního plánu",
+      "Příprava na refinancování hypotéky"
+    ],
+    "open_tasks": [
+      { "task_id": "task_cli_001", "description": "Dodat pojistnou smlouvu z ČP", "assigned_to": "client", "status": "open", "due_date": "2026-04-01" },
+      { "task_id": "task_cli_002", "description": "Dodat výpis z PS ČSOB", "assigned_to": "client", "status": "open", "due_date": "2026-04-01" }
+    ],
+    "unresolved_areas": [
+      "Majetkové pojištění — nezjištěno",
+      "Přesné pojistné na ŽP — nezjištěno",
+      "Zdravotní stav — nezjištěno"
+    ]
+  },
+  "metadata": {
+    "profile_completeness_score": 68,
+    "last_meeting_date": "2026-03-25",
+    "total_meetings": 1,
+    "data_quality_notes": [
+      "Měsíční výdaje domácnosti jsou odhadem klienta — upřesnit",
+      "Chybí informace o majetkovém pojištění",
+      "Chybí zdravotní anamnéza pro modelaci ŽP"
+    ]
+  }
+}
