@@ -143,7 +143,12 @@ export default function ClientDetailPage() {
             {profile?.economic?.profession || 'Profese neuvedena'} | {cases.length} {cases.length === 1 ? 'schuzka' : 'schuzek'} | {client.id}
           </p>
         </div>
-        <a href="/clients"><button className="btn-outline">Zpet na klienty</button></a>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn-primary" onClick={() => window.open(`/api/clients/${clientId}/plan`, '_blank')}>
+            Financni plan
+          </button>
+          <a href="/clients"><button className="btn-outline">Zpet na klienty</button></a>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -426,7 +431,17 @@ export default function ClientDetailPage() {
             {messages.length === 0 && (
               <div style={{ color: '#9ca3af', fontSize: 14, textAlign: 'center', marginTop: 40 }}>
                 <p>Zeptejte se na cokoliv o klientovi {client.name}.</p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginTop: 16 }}>
+                <button
+                  onClick={() => window.open(`/api/clients/${clientId}/plan`, '_blank')}
+                  style={{
+                    margin: '16px auto 8px', padding: '10px 24px', background: 'var(--primary)', color: 'white',
+                    border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 14, fontWeight: 600,
+                  }}
+                >
+                  Generovat financni plan
+                </button>
+                <p style={{ fontSize: 12, marginBottom: 16 }}>nebo se zeptejte:</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginTop: 0 }}>
                   {[
                     'Jaky ma prijem?',
                     'Co vime o jeho pojisteni?',
