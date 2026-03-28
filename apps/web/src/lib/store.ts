@@ -676,28 +676,65 @@ function generateMockExtraction(filename: string, mimeType: string, purpose: str
     };
   }
 
-  // Audio recording
-  if (mimeType.startsWith('audio/') || fn.includes('.mp3') || fn.includes('.wav') || fn.includes('.m4a') || purpose === 'meeting_recording') {
+  // Transcript / audio recording — primary onboarding, extract rich initial data
+  if (fn.includes('transcript') || fn.includes('prepis') || fn.includes('zaznam') || fn.includes('schuzka') ||
+      mimeType.startsWith('audio/') || fn.includes('.mp3') || fn.includes('.wav') || fn.includes('.m4a') || purpose === 'meeting_recording') {
     return {
       _source: filename,
       _type: 'meeting_transcript',
       personal: {
+        full_name: clientName,
+        birth_year: 1985,
+        marital_status: 'married',
         health_status: 'Bez omezení',
         smoker: false,
       },
       household: {
+        household_members: 4,
+        dependents_count: 2,
         housing_type: 'Vlastní byt',
         monthly_housing_costs: 4500,
+        children: [
+          { age: 8, name: 'Syn' },
+          { age: 5, name: 'Dcera' },
+        ],
       },
       economic: {
+        employment_status: 'employed',
+        profession: 'IT manažer',
+        net_monthly_income: { amount: 48000, currency: 'CZK' },
         partner_income: { amount: 32000, currency: 'CZK' },
         monthly_expenses: 45000,
         emergency_fund_months: 3.1,
       },
+      insurance: {
+        provider: 'Česká pojišťovna',
+        product_name: 'Životní pojištění FLEXI',
+        monthly_premium: 1250,
+        coverage: {
+          death: 500000,
+          permanent_disability: 0,
+          temporary_disability: 0,
+          hospitalization: 0,
+          serious_illness: 0,
+        },
+        notes: 'Klient zmínil, že má životko jen na smrt 500 tis. Bez invalidity — nedostatečné krytí.',
+      },
+      credit: {
+        type: 'Hypotéka',
+        provider: 'Komerční banka',
+        remaining_balance: 2200000,
+        interest_rate: 3.89,
+        monthly_payment: 12500,
+        fixation_end: '2027-03',
+        property_type: 'Byt 3+kk',
+      },
       notes: [
-        `Klient ${clientName} zmínil zájem o pravidelné investování, obavy z rizika.`,
-        'Manželka zvažuje přechod na OSVČ — možný dopad na příjem.',
+        `Klient ${clientName} zmínil zájem o pravidelné investování, ale má obavy z rizika.`,
+        'Manželka zvažuje přechod na OSVČ — možný dopad na příjem domácnosti.',
         'Klient chce mít pojištěnou rodinu do doby splacení hypotéky.',
+        'Nemá žádné investice kromě spořicího účtu (cca 150 tis. Kč).',
+        'Penzijní spoření — pouze 500 Kč vlastní příspěvek, nedosahuje na max. státní příspěvek.',
       ],
     };
   }
