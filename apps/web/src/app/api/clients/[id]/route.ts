@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getClient, getAllCases } from '@/lib/store';
+import { getClient, getAllCases, updateClientProfile } from '@/lib/store';
 
 export async function GET(
   _request: NextRequest,
@@ -72,4 +72,29 @@ export async function GET(
       documents: allDocuments,
     },
   });
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const client = getClient(params.id);
+  if (!client) {
+    return NextResponse.json({ error: 'Client not found' }, { status: 404 });
+  }
+
+  const body = await request.json();
+
+  // Update name if provided
+  if (body.name && typeof body.name === 'string') {
+    client.name = body.name;
+    client.updatedAt = new Date().toISOString();
+  }
+
+  // Update profile if provided
+  if (body.profile && typeof body.profile === 'object') {
+    updateClientProfile(params.id, body.profile);
+  }
+
+  return NextResponse.json({ client: getClient(params.id) });
 }

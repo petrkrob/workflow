@@ -45,6 +45,9 @@ export default function ClientDetailPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [question, setQuestion] = useState('');
   const [asking, setAsking] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [editForm, setEditForm] = useState<any>(null);
+  const [saving, setSaving] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const fetchClient = useCallback(() => {
@@ -71,6 +74,59 @@ export default function ClientDetailPage() {
     const result = await res.json();
     setMessages(prev => [...prev, { role: 'assistant', content: result.answer, sources: result.sources }]);
     setAsking(false);
+  };
+
+  const startEditingProfile = () => {
+    const p = data?.client.profile || {};
+    setEditForm({
+      name: data?.client.name || '',
+      full_name: p.personal?.full_name || '',
+      birth_year: p.personal?.birth_year || '',
+      marital_status: p.personal?.marital_status || '',
+      household_members: p.household?.household_members || '',
+      dependents_count: p.household?.dependents_count || '',
+      employment_status: p.economic?.employment_status || '',
+      profession: p.economic?.profession || '',
+      net_monthly_income: p.economic?.net_monthly_income?.amount || '',
+    });
+    setEditingProfile(true);
+  };
+
+  const cancelEditingProfile = () => {
+    setEditingProfile(false);
+    setEditForm(null);
+  };
+
+  const saveProfile = async () => {
+    if (!editForm) return;
+    setSaving(true);
+    await fetch(`/api/clients/${clientId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: editForm.name,
+        profile: {
+          personal: {
+            full_name: editForm.full_name || editForm.name,
+            birth_year: editForm.birth_year ? Number(editForm.birth_year) : undefined,
+            marital_status: editForm.marital_status || undefined,
+          },
+          household: {
+            household_members: editForm.household_members ? Number(editForm.household_members) : undefined,
+            dependents_count: editForm.dependents_count ? Number(editForm.dependents_count) : undefined,
+          },
+          economic: {
+            employment_status: editForm.employment_status || undefined,
+            profession: editForm.profession || undefined,
+            net_monthly_income: editForm.net_monthly_income ? { amount: Number(editForm.net_monthly_income), currency: 'CZK' } : undefined,
+          },
+        },
+      }),
+    });
+    setEditingProfile(false);
+    setEditForm(null);
+    setSaving(false);
+    fetchClient();
   };
 
   if (!data) return <div>Nacitam...</div>;
@@ -121,8 +177,68 @@ export default function ClientDetailPage() {
         <>
           {/* Profile card */}
           <div className="card section">
-            <h3>Osobni udaje</h3>
-            {profile ? (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <h3 style={{ margin: 0 }}>Osobni udaje</h3>
+              {!editingProfile && (
+                <button className="btn-outline" onClick={startEditingProfile}>Upravit</button>
+              )}
+            </div>
+            {editingProfile && editForm ? (
+              <div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+                  <div>
+                    <h4 style={{ fontSize: 13, fontWeight: 600, color: '#6b7280', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Osobni</h4>
+                    <EditField label="Jmeno" value={editForm.name} onChange={v => setEditForm({ ...editForm, name: v })} />
+                    <EditField label="Cele jmeno" value={editForm.full_name} onChange={v => setEditForm({ ...editForm, full_name: v })} />
+                    <EditField label="Rok narozeni" value={editForm.birth_year} onChange={v => setEditForm({ ...editForm, birth_year: v })} type="number" />
+                    <div style={{ marginBottom: 8 }}>
+                      <label style={{ fontSize: 12, color: '#6b7280', display: 'block', marginBottom: 2 }}>Rodinny stav</label>
+                      <select
+                        value={editForm.marital_status}
+                        onChange={e => setEditForm({ ...editForm, marital_status: e.target.value })}
+                        style={{ width: '100%', padding: '6px 8px', border: '1px solid var(--border)', borderRadius: 4, fontSize: 14 }}
+                      >
+                        <option value="">—</option>
+                        <option value="single">Svobodny/a</option>
+                        <option value="married">Zenaty/vdana</option>
+                        <option value="divorced">Rozvedeny/a</option>
+                        <option value="widowed">Vdovec/vdova</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: 13, fontWeight: 600, color: '#6b7280', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Domacnost</h4>
+                    <EditField label="Clenu domacnosti" value={editForm.household_members} onChange={v => setEditForm({ ...editForm, household_members: v })} type="number" />
+                    <EditField label="Vyzivovanych osob" value={editForm.dependents_count} onChange={v => setEditForm({ ...editForm, dependents_count: v })} type="number" />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: 13, fontWeight: 600, color: '#6b7280', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Ekonomika</h4>
+                    <div style={{ marginBottom: 8 }}>
+                      <label style={{ fontSize: 12, color: '#6b7280', display: 'block', marginBottom: 2 }}>Status</label>
+                      <select
+                        value={editForm.employment_status}
+                        onChange={e => setEditForm({ ...editForm, employment_status: e.target.value })}
+                        style={{ width: '100%', padding: '6px 8px', border: '1px solid var(--border)', borderRadius: 4, fontSize: 14 }}
+                      >
+                        <option value="">—</option>
+                        <option value="employed">Zamestnanec</option>
+                        <option value="self_employed">OSVC</option>
+                        <option value="unemployed">Nezamestnany/a</option>
+                        <option value="retired">Duchodce</option>
+                      </select>
+                    </div>
+                    <EditField label="Profese" value={editForm.profession} onChange={v => setEditForm({ ...editForm, profession: v })} />
+                    <EditField label="Cisty prijem (CZK)" value={editForm.net_monthly_income} onChange={v => setEditForm({ ...editForm, net_monthly_income: v })} type="number" />
+                  </div>
+                </div>
+                <div className="section-actions" style={{ marginTop: 16 }}>
+                  <button className="btn-success" onClick={saveProfile} disabled={saving}>
+                    {saving ? 'Ukladam...' : 'Ulozit zmeny'}
+                  </button>
+                  <button className="btn-outline" onClick={cancelEditingProfile}>Zrusit</button>
+                </div>
+              </div>
+            ) : profile ? (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
                 <ProfileSection title="Osobni" data={{
                   'Jmeno': profile.personal?.full_name,
@@ -140,7 +256,10 @@ export default function ClientDetailPage() {
                 }} />
               </div>
             ) : (
-              <p style={{ color: '#9ca3af', fontSize: 14 }}>Profil zatim nevyplnen.</p>
+              <div>
+                <p style={{ color: '#9ca3af', fontSize: 14 }}>Profil zatim nevyplnen.</p>
+                <button className="btn-primary" onClick={startEditingProfile} style={{ marginTop: 8 }}>Vyplnit profil</button>
+              </div>
             )}
           </div>
 
@@ -424,6 +543,20 @@ function purposeIcon(purpose: string): string {
 function purposeLabel(purpose: string): string {
   const map: Record<string, string> = { meeting_recording: 'Nahravka', existing_contract: 'Smlouva', new_model: 'Modelace', product_info: 'Podklad', advisor_notes: 'Poznamky', other: 'Ostatni' };
   return map[purpose] || purpose;
+}
+
+function EditField({ label, value, onChange, type = 'text' }: { label: string; value: string | number; onChange: (v: string) => void; type?: string }) {
+  return (
+    <div style={{ marginBottom: 8 }}>
+      <label style={{ fontSize: 12, color: '#6b7280', display: 'block', marginBottom: 2 }}>{label}</label>
+      <input
+        type={type}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        style={{ width: '100%', padding: '6px 8px', border: '1px solid var(--border)', borderRadius: 4, fontSize: 14 }}
+      />
+    </div>
+  );
 }
 
 function formatSize(bytes: number): string {
