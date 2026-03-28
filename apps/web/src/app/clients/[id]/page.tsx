@@ -594,10 +594,14 @@ function ClientDocumentsTab({ clientId, clientFiles, caseDocuments, onUpdate }: 
         body: formData,
       });
       const result = await res.json();
-      setLastResult(result);
+      if (!res.ok) {
+        setLastResult({ error: result.error || `Chyba ${res.status}` });
+      } else {
+        setLastResult(result);
+      }
       onUpdate();
-    } catch {
-      setLastResult({ error: 'Upload selhal' });
+    } catch (err: any) {
+      setLastResult({ error: err?.message || 'Upload selhal' });
     }
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
